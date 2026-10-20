@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Assessments · Teacher Platform{% endblock %}
+{% block content %}
+<div class="page-heading"><div><p class="eyebrow">STUDENT PROGRESS</p><h1>Assessments</h1><p class="muted">Record marks and notes for each student.</p></div></div>
+<section class="panel">
+  <h2>Record an assessment</h2>
+  {% if students %}
+  <form method="post" class="form-grid">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label class="span-2">Student<select name="student_id" required><option value="">Choose a student</option>{% for student in students %}<option value="{{ student.id }}">{{ student.full_name }}{% if student.class_name %} — {{ student.class_name }}{% endif %}</option>{% endfor %}</select></label>
+    <label>Assessment title<input name="title" required maxlength="150" placeholder="e.g. Unit 1 test"></label>
+    <label>Date<input type="date" name="assessment_date" value="{{ today }}" required></label>
+    <label>Mark earned<input type="number" name="mark" min="0" step="0.01" required placeholder="e.g. 14"></label>
+    <label>Maximum mark<input type="number" name="max_mark" min="0.01" step="0.01" value="20" required></label>
+    <label class="span-2">Observation (optional)<textarea name="observation" rows="2" maxlength="1000" placeholder="Strengths, difficulties, or follow-up needed"></textarea></label>
+    <div class="span-2"><button class="button primary" type="submit">Save assessment</button></div>
+  </form>
+  {% else %}<div class="empty-state"><p>Add or import students before recording assessments.</p><a class="button primary" href="{{ url_for('students') }}">Go to students</a></div>{% endif %}
+</section>
+<section class="panel">
+  <div class="panel-heading"><div><h2>Assessment history</h2><p class="muted">{{ assessments|length }} record(s)</p></div><input class="search-input" type="search" placeholder="Search records..." data-table-search="assessments-table"></div>
+  {% if assessments %}
+  <div class="table-wrap"><table id="assessments-table"><thead><tr><th>Date</th><th>Student</th><th>Assessment</th><th>Mark</th><th>Percentage</th><th>Observation</th><th></th></tr></thead><tbody>
+  {% for item in assessments %}
+  <tr><td>{{ item.assessment_date }}</td><td>{{ item.full_name }}<span class="subcell">{{ item.class_name }}</span></td><td>{{ item.title }}</td><td>{{ item.mark|round(2) }} / {{ item.max_mark|round(2) }}</td><td>{{ ((item.mark / item.max_mark) * 100)|round(1) }}%</td><td>{{ item.observation or '—' }}</td><td><form method="post" action="{{ url_for('delete_assessment', assessment_id=item.id) }}" data-confirm="Delete this assessment?"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="button danger small" type="submit">Delete</button></form></td></tr>
+  {% endfor %}
+  </tbody></table></div>
+  {% else %}<div class="empty-state"><p>No assessment records yet.</p></div>{% endif %}
+</section>
+{% endblock %}

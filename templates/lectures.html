@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Lectures · Teacher Platform{% endblock %}
+{% block content %}
+<div class="page-heading"><div><p class="eyebrow">TEACHING RESOURCES</p><h1>Lectures</h1><p class="muted">Keep your teaching materials organized in one place.</p></div></div>
+<section class="panel">
+  <h2>Upload a lecture or resource</h2>
+  <p class="muted">Maximum file size: 10 MB. Supported types: PDF, DOC, DOCX, PPT, PPTX, TXT, PNG, JPG.</p>
+  <form method="post" enctype="multipart/form-data" class="form-grid">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label class="span-2">Title<input name="title" required maxlength="150" placeholder="e.g. Unit 2 — Reading"></label>
+    <label class="span-2">Choose file<input type="file" name="lecture_file" accept=".pdf,.doc,.docx,.ppt,.pptx,.txt,.png,.jpg,.jpeg" required></label>
+    <div class="span-2"><button class="button primary" type="submit">Upload file</button></div>
+  </form>
+</section>
+<section class="panel">
+  <div class="panel-heading"><div><h2>Your resources</h2><p class="muted">{{ lectures|length }} file(s)</p></div></div>
+  {% if lectures %}
+  <div class="resource-list">
+  {% for lecture in lectures %}
+    <div class="resource-item">
+      <div class="file-icon"><span>{{ lecture.original_filename.rsplit('.', 1)[-1]|upper }}</span></div>
+      <div class="resource-info"><strong>{{ lecture.title }}</strong><span>{{ lecture.original_filename }} · Uploaded {{ lecture.uploaded_at[:10] }}</span></div>
+      <a class="button secondary small" href="{{ url_for('download_lecture', lecture_id=lecture.id) }}">Download</a>
+      <form method="post" action="{{ url_for('delete_lecture', lecture_id=lecture.id) }}" data-confirm="Delete this uploaded file?"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="button danger small" type="submit">Delete</button></form>
+    </div>
+  {% endfor %}
+  </div>
+  {% else %}<div class="empty-state"><h3>No resources uploaded</h3><p>Upload your first lecture using the form above.</p></div>{% endif %}
+</section>
+{% endblock %}

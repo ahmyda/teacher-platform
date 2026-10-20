@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Create account · Teacher Platform{% endblock %}
+{% block content %}
+<section class="auth-card">
+  <h1>Create teacher account</h1>
+  <p class="muted">Use an email address you can access. Passwords are stored as secure hashes.</p>
+  <form method="post" class="stack">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label>Full name<input name="name" required maxlength="100" autocomplete="name"></label>
+    <label>Email address<input type="email" name="email" required maxlength="254" autocomplete="email"></label>
+    <label>Password (at least 8 characters)<input type="password" name="password" required minlength="8" autocomplete="new-password"></label>
+    <label>Confirm password<input type="password" name="confirm_password" required minlength="8" autocomplete="new-password"></label>
+    <button class="button primary" type="submit">Create account</button>
+  </form>
+  <p class="auth-switch">Already registered? <a href="{{ url_for('login') }}">Log in</a></p>
+  <p class="small-note">For a public deployment, teacher registration should be approved or invitation-only.</p>
+</section>
+{% endblock %}
